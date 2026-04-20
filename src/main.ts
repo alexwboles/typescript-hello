@@ -23,35 +23,6 @@ function createSeatingMatrix(rows = TOTAL_ROWS, columns = TOTAL_COLUMNS): Seatin
   return matrix;
 }
 
-// Convert the matrix to a printable text table with row/column labels.
-function matrixToString(matrix: SeatingMatrix): string {
-  let header = "     ";
-
-  for (let column = 1; column <= matrix[0].length; column++) {
-    header += `${String(column).padStart(2, " ")} `;
-  }
-
-  const lines: string[] = [header, "    " + "---".repeat(matrix[0].length)];
-
-  for (let row = 0; row < matrix.length; row++) {
-    let rowLine = `R${String(row + 1).padStart(2, "0")} |`;
-
-    for (let column = 0; column < matrix[row].length; column++) {
-      rowLine += matrix[row][column] === 1 ? " X " : " L ";
-    }
-
-    lines.push(rowLine);
-  }
-
-  return lines.join("\n");
-}
-
-// Print the current room state in the browser console.
-function printSeatingRoom(matrix: SeatingMatrix): void {
-  console.log("\nCurrent Screening Room Layout");
-  console.log(matrixToString(matrix));
-}
-
 // Check whether a seat coordinate is inside valid bounds.
 function isValidSeatPosition(matrix: SeatingMatrix, rowNumber: number, columnNumber: number): boolean {
   return (
@@ -168,30 +139,6 @@ function printSeatCounters(matrix: SeatingMatrix): void {
   console.log(`Available seats: ${available}`);
 }
 
-// Print the adjacent-seat search result in the console.
-function printAdjacentSearchResult(matrix: SeatingMatrix): void {
-  const adjacentPair = findAdjacentAvailableSeats(matrix);
-
-  if (adjacentPair) {
-    console.log(
-      `Adjacent seats found: (${adjacentPair[0][0]}, ${adjacentPair[0][1]}) and (${adjacentPair[1][0]}, ${adjacentPair[1][1]}).`
-    );
-  } else {
-    console.log("No adjacent available seats found.");
-  }
-}
-
-// Build a plain-language adjacent-seat message for UI display.
-function adjacentResultToString(matrix: SeatingMatrix): string {
-  const adjacentPair = findAdjacentAvailableSeats(matrix);
-
-  if (adjacentPair) {
-    return `Adjacent seats found: (${adjacentPair[0][0]}, ${adjacentPair[0][1]}) and (${adjacentPair[1][0]}, ${adjacentPair[1][1]}).`;
-  }
-
-  return "No adjacent available seats found.";
-}
-
 // Build the clickable seat-grid markup for the interactive challenge section.
 function seatMapGridHtml(matrix: SeatingMatrix, highlightedSeats: [number, number][]): string {
   let grid = '<div class="overflow-x-auto"><div class="inline-block min-w-max rounded-2xl border border-slate-200 bg-slate-50 p-4">';
@@ -249,23 +196,18 @@ function seatMapGridHtml(matrix: SeatingMatrix, highlightedSeats: [number, numbe
 function renderInteractiveSeatManager(
   matrix: SeatingMatrix,
   latestMessage: string,
-  advancedMessage: string,
   highlightedSeats: [number, number][]
 ): void {
   const seatMap = document.querySelector<HTMLDivElement>("#interactive-seat-map");
   const status = document.querySelector<HTMLDivElement>("#interactive-status");
-  const adjacency = document.querySelector<HTMLParagraphElement>("#interactive-adjacent");
-  const matrixPreview = document.querySelector<HTMLPreElement>("#interactive-matrix-preview");
 
-  if (!seatMap || !status || !adjacency || !matrixPreview) {
+  if (!seatMap || !status) {
     return;
   }
 
   const [occupied, available] = countSeats(matrix);
   seatMap.innerHTML = seatMapGridHtml(matrix, highlightedSeats);
   status.textContent = `${latestMessage} Occupied: ${occupied}. Available: ${available}.`;
-  adjacency.textContent = advancedMessage;
-  matrixPreview.textContent = matrixToString(matrix);
 }
 
 console.clear();
@@ -273,7 +215,6 @@ console.log("Cinema Seat Manager - TypeScript");
 
 const interactiveRoom = createSeatingMatrix();
 let interactiveMessage = "Click an available seat (L) to reserve it.";
-let advancedMessage = adjacentResultToString(interactiveRoom);
 let highlightedSeats: [number, number][] = [];
 
 const app = document.querySelector<HTMLDivElement>("#app");
@@ -293,12 +234,10 @@ if (app) {
       </div>
       <div id="interactive-seat-map" class="mt-4"></div>
       <div id="interactive-status" class="mt-4 rounded-lg bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700"></div>
-      <p id="interactive-adjacent" class="mt-2 text-sm text-slate-600"></p>
-      <pre id="interactive-matrix-preview" class="mt-3 overflow-x-auto rounded-xl bg-slate-950 p-4 text-xs leading-6 text-emerald-200"></pre>
     </section>
   `;
 
-  renderInteractiveSeatManager(interactiveRoom, interactiveMessage, advancedMessage, highlightedSeats);
+  renderInteractiveSeatManager(interactiveRoom, interactiveMessage, highlightedSeats);
 
   app.addEventListener("click", (event) => {
     const rawTarget = event.target;
@@ -319,28 +258,23 @@ if (app) {
 
       if (pair) {
         highlightedSeats = [pair[0], pair[1]];
-        advancedMessage = `First adjacent available seats: (${pair[0][0]}, ${pair[0][1]}) and (${pair[1][0]}, ${pair[1][1]}).`;
-        console.log(advancedMessage);
+        console.log(`First adjacent available seats: (${pair[0][0]}, ${pair[0][1]}) and (${pair[1][0]}, ${pair[1][1]}).`);
       } else {
         highlightedSeats = [];
-        advancedMessage = "No adjacent available seats found.";
-        console.log(advancedMessage);
+        console.log("No adjacent available seats found.");
       }
 
       printSeatCounters(interactiveRoom);
-      printSeatingRoom(interactiveRoom);
-
-      renderInteractiveSeatManager(interactiveRoom, interactiveMessage, advancedMessage, highlightedSeats);
+      renderInteractiveSeatManager(interactiveRoom, interactiveMessage, highlightedSeats);
       return;
     }
 
     if (clickedButton.id === "clear-highlights-btn") {
       console.log("\nAction: Clear Highlights");
       highlightedSeats = [];
-      advancedMessage = "Highlights cleared. Click Find Adjacent Seats to search again.";
-      console.log(advancedMessage);
+      console.log("Highlights cleared. Click Find Adjacent Seats to search again.");
       printSeatCounters(interactiveRoom);
-      renderInteractiveSeatManager(interactiveRoom, interactiveMessage, advancedMessage, highlightedSeats);
+      renderInteractiveSeatManager(interactiveRoom, interactiveMessage, highlightedSeats);
       return;
     }
 
@@ -359,10 +293,7 @@ if (app) {
     const [, message] = reserveSeat(interactiveRoom, rowValue, columnValue, true);
     interactiveMessage = message;
     highlightedSeats = [];
-    advancedMessage = adjacentResultToString(interactiveRoom);
-    console.log(advancedMessage);
     printSeatCounters(interactiveRoom);
-    printSeatingRoom(interactiveRoom);
-    renderInteractiveSeatManager(interactiveRoom, interactiveMessage, advancedMessage, highlightedSeats);
+    renderInteractiveSeatManager(interactiveRoom, interactiveMessage, highlightedSeats);
   });
 }

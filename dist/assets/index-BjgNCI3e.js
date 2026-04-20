@@ -10,7 +10,7 @@ Current Screening Room Layout`),console.log(m(n))}function j(n,e,t){return e>=1&
         >
           ${l?"X":"L"}
         </button>
-      `}t+="</div>"}return t+="</div></div>",t}function f(n,e,t,o){const s=document.querySelector("#interactive-seat-map"),a=document.querySelector("#interactive-status"),l=document.querySelector("#interactive-adjacent"),c=document.querySelector("#interactive-matrix-preview");if(!s||!a||!l||!c)return;const[b,u]=x(n);s.innerHTML=A(n,o),a.textContent=`${e} Occupied: ${b}. Available: ${u}.`,l.textContent=t,c.textContent=m(n)}console.clear();console.log("Cinema Seat Manager - TypeScript");const i=L();let g="Click an available seat (L) to reserve it.",r=$(i),d=[];const v=document.querySelector("#app");v&&(v.innerHTML=`
+      `}t+="</div>"}return t+="</div></div>",t}function f(n,e,t){const o=document.querySelector("#interactive-seat-map"),s=document.querySelector("#interactive-status");if(!o||!s)return;const[a,l]=x(n);o.innerHTML=A(n,t),s.textContent=`${e} Occupied: ${a}. Available: ${l}.`}console.clear();console.log("Cinema Seat Manager - TypeScript");const i=L();let g="Click an available seat (L) to reserve it.",r=$(i),d=[];const v=document.querySelector("#app");v&&(v.innerHTML=`
     <section class="space-y-2">
       <h1 class="text-4xl font-black tracking-tight text-slate-900">Cinema Seat Manager</h1>
       <p class="text-slate-600">Interactive challenge complete: use the visual seat map below to reserve seats with clicks.</p>
@@ -25,10 +25,9 @@ Current Screening Room Layout`),console.log(m(n))}function j(n,e,t){return e>=1&
       </div>
       <div id="interactive-seat-map" class="mt-4"></div>
       <div id="interactive-status" class="mt-4 rounded-lg bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700"></div>
-      <p id="interactive-adjacent" class="mt-2 text-sm text-slate-600"></p>
-      <pre id="interactive-matrix-preview" class="mt-3 overflow-x-auto rounded-xl bg-slate-950 p-4 text-xs leading-6 text-emerald-200"></pre>
+      
     </section>
-  `,f(i,g,r,d),v.addEventListener("click",n=>{const e=n.target;if(!(e instanceof HTMLElement))return;const t=e.closest("button");if(!(t instanceof HTMLButtonElement))return;if(t.id==="find-adjacent-btn"){console.log(`
-Action: Find Adjacent Seats`);const l=S(i);l?(d=[l[0],l[1]],r=`First adjacent available seats: (${l[0][0]}, ${l[0][1]}) and (${l[1][0]}, ${l[1][1]}).`,console.log(r)):(d=[],r="No adjacent available seats found.",console.log(r)),p(i),h(i),f(i,g,r,d);return}if(t.id==="clear-highlights-btn"){console.log(`
-Action: Clear Highlights`),d=[],r="Highlights cleared. Click Find Adjacent Seats to search again.",console.log(r),p(i),f(i,g,r,d);return}if(!t.classList.contains("seat-btn"))return;const o=Number(t.dataset.row),s=Number(t.dataset.column);if(!Number.isFinite(o)||!Number.isFinite(s))return;console.log(`
-Action: Reserve Seat (${o}, ${s})`);const[,a]=C(i,o,s,!0);g=a,d=[],r=$(i),console.log(r),p(i),h(i),f(i,g,r,d)}));
+  `,f(i,g,d),v.addEventListener("click",n=>{const e=n.target;if(!(e instanceof HTMLElement))return;const t=e.closest("button");if(!(t instanceof HTMLButtonElement))return;if(t.id==="find-adjacent-btn"){console.log(`
+Action: Find Adjacent Seats`);const l=S(i);l?(d=[l[0],l[1]],r=`First adjacent available seats: (${l[0][0]}, ${l[0][1]}) and (${l[1][0]}, ${l[1][1]}).`,console.log(r)):(d=[],r="No adjacent available seats found.",console.log(r)),p(i),h(i),f(i,g,d);return}if(t.id==="clear-highlights-btn"){console.log(`
+Action: Clear Highlights`),d=[],r="Highlights cleared. Click Find Adjacent Seats to search again.",console.log(r),p(i),f(i,g,d);return}if(!t.classList.contains("seat-btn"))return;const o=Number(t.dataset.row),s=Number(t.dataset.column);if(!Number.isFinite(o)||!Number.isFinite(s))return;console.log(`
+Action: Reserve Seat (${o}, ${s})`);const[,a]=C(i,o,s,!0);g=a,d=[],r=$(i),console.log(r),p(i),h(i),f(i,g,d)}));
